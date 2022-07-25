@@ -26,10 +26,5 @@ class PersonStruct extends Structurable
 
     #[Property]
     protected Document $document;
-
-    public function getCountryID(): ?int
-    {
-        return $this->countryID;
-    }
 }
 ```
