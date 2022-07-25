@@ -1,0 +1,37 @@
+{
+  "name": "vaened/laravel-structer",
+  "description": "Helpers for typical structures in a development",
+  "keywords": [
+    "struct",
+    "structure",
+    "POJO"
+  ],
+  "license": "MIT",
+  "type": "library",
+  "minimum-stability": "stable",
+  "authors": [
+    {
+      "name": "enea",
+      "email": "enea.so@live.com"
+    }
+  ],
+  "require": {
+    "php": "^8.1",
+    "laravel/framework": "^9.0",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.0",
+    "orchestra/testbench": "^7.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Vaened\\Structer\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Vaened\\Structer\\Tests\\": "tests/"
+    }
+  }
+}
