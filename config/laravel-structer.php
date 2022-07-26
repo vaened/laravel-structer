@@ -4,6 +4,7 @@
  */
 
 return [
+
     /*
     |--------------------------------------------------------------------------
     | Mass Assignment
@@ -16,4 +17,19 @@ return [
     */
 
     'allow-mass-assignment' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Collections
+    |--------------------------------------------------------------------------
+    |
+    | Store static data collections, generally used for configurations
+    | table =>
+    |   column => value
+    |
+    */
+
+    'collections' => [
+
+    ],
 ];
