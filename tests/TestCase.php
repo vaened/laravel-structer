@@ -7,6 +7,7 @@ namespace Vaened\Structer\Tests;
 
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Orchestra\Testbench\TestCase as TestbenchTestCase;
+use Vaened\Structer\Tests\Models\OriginCode;
 
 class TestCase extends TestbenchTestCase
 {
@@ -19,6 +20,22 @@ class TestCase extends TestbenchTestCase
     protected function config(ConfigContract $config): void
     {
         $config->set('laravel-structer.allow-mass-assignment', true);
+        $config->set('laravel-structer.collections', [
+            'origins' => [
+                [
+                    'id' => OriginCode::HOSPITALIZATION,
+                    'description' => 'Hospitalization',
+                ],
+                [
+                    'id' => OriginCode::EXTERNAL,
+                    'description' => 'External',
+                ],
+                [
+                    'id' => OriginCode::EMERGENCY,
+                    'description' => 'Emergency',
+                ],
+            ]
+        ]);
     }
 
     protected function turnOffMassAssignment(): void
