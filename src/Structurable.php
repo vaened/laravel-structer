@@ -38,9 +38,9 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
 {
     use Relatable, Serializable;
 
-    private string $defaultDateFormat = 'Y-m-d H:i:s';
+    protected string $defaultDateFormat = 'Y-m-d H:i:s';
 
-    private array  $fields            = [];
+    private array    $fields            = [];
 
     public function __construct(array $attributes)
     {
@@ -69,7 +69,7 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
     private function catchMetadata(array $properties): void
     {
         foreach ($properties as $property) {
-            $annotation = $property->getAttributes(Property::class)[0]->newInstance();
+            $annotation     = $property->getAttributes(Property::class)[0]->newInstance();
             $this->fields[] = new Metadata($property->getName(), $annotation);
         }
     }
