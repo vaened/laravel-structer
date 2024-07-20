@@ -7,6 +7,7 @@ namespace Vaened\Structer;
 
 use BackedEnum;
 use Closure;
+use DateTimeInterface;
 use Illuminate\Contracts\Support\{Arrayable, Jsonable};
 use Illuminate\Support\Arr;
 use JsonSerializable;
@@ -24,6 +25,7 @@ use function array_filter;
 use function config;
 use function count;
 use function in_array;
+use function is_a;
 use function is_subclass_of;
 
 /**
@@ -36,7 +38,9 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
 {
     use Relatable, Serializable;
 
-    private array $fields = [];
+    private string $defaultDateFormat = 'Y-m-d H:i:s';
+
+    private array  $fields            = [];
 
     public function __construct(array $attributes)
     {
@@ -65,7 +69,7 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
     private function catchMetadata(array $properties): void
     {
         foreach ($properties as $property) {
-            $annotation     = $property->getAttributes(Property::class)[0]->newInstance();
+            $annotation = $property->getAttributes(Property::class)[0]->newInstance();
             $this->fields[] = new Metadata($property->getName(), $annotation);
         }
     }
@@ -138,7 +142,9 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
             $type->allowsNull() && $value === null ? null :
                 match (true) {
                     is_subclass_of($propertyType, BackedEnum::class) => $propertyType::from($value),
-                    default => $value
+                    is_a($propertyType, DateTimeInterface::class, true) => $propertyType::createFromFormat($this->defaultDateFormat,
+                        $value),
+                    default => self::cast($property, $value),
                 });
     }
 
@@ -157,5 +163,10 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
     private function getReflectionClass(): ReflectionClass
     {
         return new ReflectionClass(static::class);
+    }
+
+    protected static function cast(ReflectionProperty $property, mixed $value): mixed
+    {
+        return $value;
     }
 }

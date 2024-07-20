@@ -34,7 +34,8 @@ class StructurableTest extends TestCase
             'first_name' => 'Enea',
             'last_name'  => 'Flores',
             'document'   => new Document('1', '12345678'),
-            'sex'        => 'male'
+            'sex'        => 'male',
+            'birth_date' => '2022-01-01 00:00:00',
         ];
 
         $person = new PersonStruct($attributes);
@@ -61,6 +62,7 @@ class StructurableTest extends TestCase
             'first_name'   => 'Enea',
             'last_name'    => 'Flores',
             'sex'          => null,
+            'birth_date'   => null,
             'phone_number' => null,
             'country_id'   => null,
             'document'     => [
@@ -81,6 +83,7 @@ class StructurableTest extends TestCase
             'phone_number' => null,
             'country_id'   => null,
             'sex'          => null,
+            'birth_date'   => null,
             'document'     => [
                 'document_type_id' => 1,
                 'document_number'  => '12345678'
@@ -102,6 +105,7 @@ class StructurableTest extends TestCase
             'phone_number' => null,
             'country_id'   => null,
             'sex'          => null,
+            'birth_date'   => null,
             'document'     => [
                 'document_type_id' => 1,
                 'document_number'  => '12345678'

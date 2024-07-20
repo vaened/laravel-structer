@@ -5,6 +5,7 @@
 
 namespace Vaened\Structer\Tests\Models\Structures;
 
+use Carbon\Carbon;
 use Vaened\Structer\Annotations\Property;
 use Vaened\Structer\Structurable;
 use Vaened\Structer\Tests\Models\Document;
@@ -28,6 +29,9 @@ class PersonStruct extends Structurable
 
     #[Property(column: 'sex')]
     protected ?Sex     $sex;
+
+    #[Property(column: 'birth_date')]
+    protected ?Carbon  $birthDate;
 
     #[Property]
     protected Document $document;
