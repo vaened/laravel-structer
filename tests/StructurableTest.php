@@ -13,6 +13,7 @@ use Vaened\Structer\Tests\Models\Country;
 use Vaened\Structer\Tests\Models\Document;
 use Vaened\Structer\Tests\Models\Gender;
 use Vaened\Structer\Tests\Models\Structures\PersonStruct;
+
 use function array_merge;
 use function json_encode;
 use function sprintf;
@@ -29,14 +30,14 @@ class StructurableTest extends TestCase
     public function test_create_from_column_names(): void
     {
         $attributes = [
-            'id' => 1,
+            'id'         => 1,
             'first_name' => 'Enea',
-            'last_name' => 'Flores',
-            'document' => new Document('1', '12345678'),
+            'last_name'  => 'Flores',
+            'document'   => new Document('1', '12345678'),
+            'sex'        => 'male'
         ];
 
         $person = new PersonStruct($attributes);
-
         $this->assertInstanceOf(Structurable::class, $person);
     }
 
@@ -55,34 +56,36 @@ class StructurableTest extends TestCase
     {
         $person = new PersonStruct($this->getAttributes());
 
-        $this->assertEquals($person->toArray(), [
-            'id' => 1,
-            'first_name' => 'Enea',
-            'last_name' => 'Flores',
+        $this->assertEquals([
+            'id'           => 1,
+            'first_name'   => 'Enea',
+            'last_name'    => 'Flores',
+            'sex'          => null,
             'phone_number' => null,
-            'country_id' => null,
-            'document' => [
+            'country_id'   => null,
+            'document'     => [
                 'document_type_id' => 1,
-                'document_number' => '12345678'
+                'document_number'  => '12345678'
             ]
-        ]);
+        ], $person->toArray());
     }
 
     public function test_convert_to_json_with_column_names(): void
     {
         $person = new PersonStruct($this->getAttributes());
 
-        $this->assertEquals($person->toJson(), json_encode([
-            'id' => 1,
-            'first_name' => 'Enea',
-            'last_name' => 'Flores',
+        $this->assertEquals(json_encode([
+            'id'           => 1,
+            'first_name'   => 'Enea',
+            'last_name'    => 'Flores',
             'phone_number' => null,
-            'country_id' => null,
-            'document' => [
+            'country_id'   => null,
+            'sex'          => null,
+            'document'     => [
                 'document_type_id' => 1,
-                'document_number' => '12345678'
+                'document_number'  => '12345678'
             ]
-        ], JSON_THROW_ON_ERROR));
+        ], JSON_THROW_ON_ERROR), $person->toJson());
     }
 
     public function test_allow_and_ignore_unaccepted_values(): void
@@ -92,17 +95,18 @@ class StructurableTest extends TestCase
         $person = new PersonStruct(array_merge($this->getAttributes(), ['non-existing' => 1]));
 
         $this->assertInstanceOf(PersonStruct::class, $person);
-        $this->assertEquals($person->toArray(), [
-            'id' => 1,
-            'first_name' => 'Enea',
-            'last_name' => 'Flores',
+        $this->assertEquals([
+            'id'           => 1,
+            'first_name'   => 'Enea',
+            'last_name'    => 'Flores',
             'phone_number' => null,
-            'country_id' => null,
-            'document' => [
+            'country_id'   => null,
+            'sex'          => null,
+            'document'     => [
                 'document_type_id' => 1,
-                'document_number' => '12345678'
+                'document_number'  => '12345678'
             ]
-        ]);
+        ], $person->toArray());
     }
 
     public function test_throw_error_when_assigning_unaccepted_values(): void
@@ -145,10 +149,10 @@ class StructurableTest extends TestCase
     private function getAttributes(): array
     {
         return [
-            'ID' => 1,
+            'ID'        => 1,
             'firstName' => 'Enea',
-            'lastName' => 'Flores',
-            'document' => new Document('1', '12345678'),
+            'lastName'  => 'Flores',
+            'document'  => new Document('1', '12345678'),
         ];
     }
 }

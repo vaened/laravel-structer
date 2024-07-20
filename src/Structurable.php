@@ -5,21 +5,26 @@
 
 namespace Vaened\Structer;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Contracts\Support\{Arrayable, Jsonable};
 use Illuminate\Support\Arr;
 use JsonSerializable;
 use ReflectionClass;
+use ReflectionIntersectionType;
 use ReflectionProperty;
+use ReflectionUnionType;
 use Vaened\Structer\Annotations\Property;
 use Vaened\Structer\Exceptions\MassAssignmentException;
 use Vaened\Structer\Util\Metadata;
 use Vaened\Structer\Util\Relatable;
 use Vaened\Structer\Util\Serializable;
+
 use function array_filter;
 use function config;
 use function count;
 use function in_array;
+use function is_subclass_of;
 
 /**
  * The Structurable class is used to represent a model, makes it easy to decorate, validate, and is generated from a Laravel request
@@ -38,6 +43,16 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
         $this->setSecureAttributes($attributes);
     }
 
+    protected function isAllowMassAssignment(): bool
+    {
+        return config('laravel-structer.allow-mass-assignment', true);
+    }
+
+    protected function onlyMarkedProperties(): Closure
+    {
+        return static fn(ReflectionProperty $property) => count($property->getAttributes(Property::class)) > 0;
+    }
+
     private function setSecureAttributes(array $attributes): void
     {
         $properties = $this->getReflectionProperties();
@@ -50,7 +65,7 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
     private function catchMetadata(array $properties): void
     {
         foreach ($properties as $property) {
-            $annotation = $property->getAttributes(Property::class)[0]->newInstance();
+            $annotation     = $property->getAttributes(Property::class)[0]->newInstance();
             $this->fields[] = new Metadata($property->getName(), $annotation);
         }
     }
@@ -82,7 +97,7 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
     {
         foreach ($properties as $property) {
             $metadata = $this->getMetadataOf($property);
-            $value = $this->extractValueOf($metadata, $attributes);
+            $value    = $this->extractValueOf($metadata, $attributes);
             $this->setValue($property, $value);
         }
     }
@@ -107,12 +122,29 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
 
     private function setValue(ReflectionProperty $property, mixed $value): void
     {
-        $property->setValue($this, $value);
+        $type = $property->getType();
+
+        if (
+            $type instanceof ReflectionUnionType ||
+            $type instanceof ReflectionIntersectionType ||
+            $type->isBuiltin()) {
+            $property->setValue($this, $value);
+            return;
+        }
+
+        $propertyType = $type->getName();
+
+        $property->setValue($this,
+            $type->allowsNull() && $value === null ? null :
+                match (true) {
+                    is_subclass_of($propertyType, BackedEnum::class) => $propertyType::from($value),
+                    default => $value
+                });
     }
 
     private function validateAllowedAttribute(string $column, array $properties): void
     {
-        if (! in_array($column, $properties, true)) {
+        if (!in_array($column, $properties, true)) {
             throw new MassAssignmentException("The [$column] attribute is not assignable to " . static::class);
         }
     }
@@ -125,15 +157,5 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
     private function getReflectionClass(): ReflectionClass
     {
         return new ReflectionClass(static::class);
-    }
-
-    protected function isAllowMassAssignment(): bool
-    {
-        return config('laravel-structer.allow-mass-assignment', true);
-    }
-
-    protected function onlyMarkedProperties(): Closure
-    {
-        return static fn(ReflectionProperty $property) => count($property->getAttributes(Property::class)) > 0;
     }
 }
