@@ -24,6 +24,12 @@ class PersonStruct extends Structurable
     #[Property(column: 'country_id', references: 'countries')]
     protected ?string $countryID;
 
+    #[Property(column: 'sex')]
+    protected ?Sex     $sex;
+
+    #[Property(column: 'birth_date')]
+    protected ?Carbon  $birthDate;
+
     #[Property]
     protected Document $document;
 }
