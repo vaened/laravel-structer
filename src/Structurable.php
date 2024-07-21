@@ -26,6 +26,7 @@ use function config;
 use function count;
 use function in_array;
 use function is_a;
+use function is_object;
 use function is_subclass_of;
 
 /**
@@ -126,11 +127,17 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
 
     private function setValue(ReflectionProperty $property, mixed $value): void
     {
+        if ($value === null && $property->hasDefaultValue()) {
+            $property->setValue($this, $property->getDefaultValue());
+            return;
+        }
+
         $type = $property->getType();
 
         if (
             $type instanceof ReflectionUnionType ||
             $type instanceof ReflectionIntersectionType ||
+            is_object($value) ||
             $type->isBuiltin()) {
             $property->setValue($this, $value);
             return;
