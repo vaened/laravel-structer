@@ -39,13 +39,18 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
 {
     use Relatable, Serializable;
 
-    protected string $defaultDateFormat = 'Y-m-d H:i:s';
+    protected string $entryDateFormat = 'Y-m-d H:i:s';
 
-    private array    $fields            = [];
+    private array    $fields          = [];
 
     public function __construct(array $attributes)
     {
         $this->setSecureAttributes($attributes);
+    }
+
+    protected function outputDateFormat(): string
+    {
+        return $this->entryDateFormat;
     }
 
     protected function isAllowMassAssignment(): bool
@@ -149,7 +154,7 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
             $type->allowsNull() && $value === null ? null :
                 match (true) {
                     is_subclass_of($propertyType, BackedEnum::class) => $propertyType::from($value),
-                    is_a($propertyType, DateTimeInterface::class, true) => $propertyType::createFromFormat($this->defaultDateFormat,
+                    is_a($propertyType, DateTimeInterface::class, true) => $propertyType::createFromFormat($this->entryDateFormat,
                         $value),
                     default => self::cast($property, $value),
                 });
