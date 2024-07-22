@@ -27,7 +27,7 @@ trait Serializable
     {
         $columns = array_reduce($this->getReflectionProperties(), $this->transformToColumnName(), []);
 
-        return Arr::map($columns, static fn($value) => match (true) {
+        return Arr::map($columns, fn($value) => match (true) {
             $value instanceof DateTimeInterface => $value->format($this->outputDateFormat()),
             $value instanceof BackedEnum => $value->value,
             $value instanceof Arrayable => $value->toArray(),
