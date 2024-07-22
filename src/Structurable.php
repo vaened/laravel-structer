@@ -156,7 +156,7 @@ abstract class Structurable implements Arrayable, Jsonable, JsonSerializable
                     is_subclass_of($propertyType, BackedEnum::class) => $propertyType::from($value),
                     is_a($propertyType, DateTimeInterface::class, true) => $propertyType::createFromFormat($this->entryDateFormat,
                         $value),
-                    default => self::cast($property, $value),
+                    default => static::cast($property, $value),
                 });
     }
 
